@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 
-GPGPU::GPGPU(int w, int h) : _rAngle(0), _hoge(0), _iWidth(w), _iHeight(h)
+GPGPU::GPGPU(int w, int h) : _rAngle(0), _hoge(0), _initialized(0), _iWidth(w), _iHeight(h)
 {
     // Create a simple 2D texture.  This example does not use
     // render to texture -- it just copies from the framebuffer to the
@@ -51,6 +51,7 @@ GPGPU::GPGPU(int w, int h) : _rAngle(0), _hoge(0), _iWidth(w), _iHeight(h)
     // Get location of the uniform variables
     _texUnit = glGetUniformLocation(_programId, "texUnit");
 	_hoge = glGetUniformLocation(_programId, "hoge");
+	_initializedLoc = glGetUniformLocation(_programId, "initialized");
 }
 
 void GPGPU::update()
@@ -72,6 +73,7 @@ void GPGPU::update()
     glViewport(0, 0, _iWidth, _iHeight);
         
     // Render a teapot and 3 tori
+	/*
     glClear(GL_COLOR_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -90,10 +92,13 @@ void GPGPU::update()
     glRotatef(1.78 * _rAngle, 0.5, 0, 1);
     glutSolidTorus(0.05, 0.9, 64, 64);
     glPopMatrix();
+	*/
         
     // copy the results to the texture
-    glBindTexture(GL_TEXTURE_2D, _textureId);
-    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, _iWidth, _iHeight);
+	if (_initialized == 1) {
+		glBindTexture(GL_TEXTURE_2D, _textureId);
+		//glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, _iWidth, _iHeight);
+	}
         
 
     // run the edge detection filter over the geometry texture
@@ -104,6 +109,8 @@ void GPGPU::update()
     glUniform1i(_texUnit, 0);
 	float r = (float)(rand() % 100) * 0.01f;
 	glUniform1f(_hoge, r);
+	glUniform1i(_initializedLoc, _initialized);
+	_initialized = 1;
             
     // GPGPU CONCEPT 4: Viewport-Sized Quad = Data Stream Generator.
     // In order to execute fragment programs, we need to generate pixels.

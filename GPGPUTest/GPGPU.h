@@ -18,6 +18,8 @@ private:
     int _iWidth, _iHeight;	// The dimensions of the data array
     float _rAngle;			// used for animation
 	float _hoge;
+	int _initialized;
+	GLuint _initializedLoc;
     
     GLuint _textureId;		// The texture ID used to store data array
     GLuint _programId;		// the program ID
