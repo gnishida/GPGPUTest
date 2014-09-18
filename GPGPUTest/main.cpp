@@ -23,21 +23,6 @@ void reshape(int w, int h);
 // globals
 GPGPU  *g_pHello;
 
-int loadshader(char* filename, std::string& text)
-{
-	std::ifstream ifs;
-	ifs.open(filename, std::ios::in);
-
-	std::string line;
-	while (ifs.good()) {
-        getline(ifs, line);
-
-		text += line + "\n";
-    }
-
-	return 0;
-}
-
 // GLUT idle function
 void idle()
 {
