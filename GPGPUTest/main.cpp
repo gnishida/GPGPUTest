@@ -57,43 +57,45 @@ public: // methods
         // Textures are the GPGPU equivalent of arrays in standard 
         // computation. Here we allocate a texture large enough to fit our
         // data (which is arbitrary in this example).
-        glGenTextures(1, &_iTexture);
-        glBindTexture(GL_TEXTURE_2D, _iTexture);
+        glGenTextures(1, &_textureId);
+        glBindTexture(GL_TEXTURE_2D, _textureId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _iWidth, _iHeight, 
-                     0, GL_RGB, GL_FLOAT, 0);
-       
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _iWidth, _iHeight, 0, GL_RGB, GL_FLOAT, 0);
 
-        _programObject = glCreateProgramObjectARB();
+        _programId = glCreateProgram();
 
 		// load fragment shader which will be used as computational kernel
 		std::string edgeFragSource2;
 		loadshader("fragment.glsl", edgeFragSource2);
 
         // Create the edge detection fragment program
-        _fragmentShader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+        _fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 		const char* source = edgeFragSource2.c_str();
-        glShaderSourceARB(_fragmentShader, 1, &source, NULL);
-        glCompileShaderARB(_fragmentShader);
-        glAttachObjectARB(_programObject, _fragmentShader);
+        glShaderSource(_fragmentShader, 1, &source, NULL);
+        glCompileShader(_fragmentShader);
+        glAttachShader(_programId, _fragmentShader);
 
         // Link the shader into a complete GLSL program.
-        glLinkProgramARB(_programObject);
-        GLint progLinkSuccess;
-        glGetObjectParameterivARB(_programObject, GL_OBJECT_LINK_STATUS_ARB,
-                &progLinkSuccess);
-        if (!progLinkSuccess)
-        {
-            fprintf(stderr, "Filter shader could not be linked\n");
-            exit(1);
-        }
+        glLinkProgram(_programId);
 
-        // Get location of the sampler uniform
-        _texUnit = glGetUniformLocationARB(_programObject, "texUnit");
-		_hoge = glGetUniformLocationARB(_programObject, "hoge");
+		// Check program
+		{
+			int infologLength = 0;
+			glGetProgramiv(_programId, GL_INFO_LOG_LENGTH, &infologLength);
+			if (infologLength > 0) {
+				char *infoLog = (char *)malloc(infologLength);
+				glGetProgramInfoLog(_programId, infologLength, NULL, infoLog);
+				printf("%s\n",infoLog);
+				free(infoLog);
+			}
+		}
+
+        // Get location of the uniform variables
+        _texUnit = glGetUniformLocation(_programId, "texUnit");
+		_hoge = glGetUniformLocation(_programId, "hoge");
     }
 
     // This method updates the texture by rendering the geometry (a teapot 
@@ -141,18 +143,18 @@ public: // methods
         glPopMatrix();
         
         // copy the results to the texture
-        glBindTexture(GL_TEXTURE_2D, _iTexture);
+        glBindTexture(GL_TEXTURE_2D, _textureId);
         glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, _iWidth, _iHeight);
         
 
         // run the edge detection filter over the geometry texture
         // Activate the edge detection filter program
-        glUseProgramObjectARB(_programObject);
+        glUseProgram(_programId);
             
         // identify the bound texture unit as input to the filter
-        glUniform1iARB(_texUnit, 0);
+        glUniform1i(_texUnit, 0);
 		float r = (float)(rand() % 100) * 0.01f;
-		glUniform1fARB(_hoge, r);
+		glUniform1f(_hoge, r);
             
         // GPGPU CONCEPT 4: Viewport-Sized Quad = Data Stream Generator.
         // In order to execute fragment programs, we need to generate pixels.
@@ -173,7 +175,7 @@ public: // methods
         glEnd();
         
         // disable the filter
-        glUseProgramObjectARB(0);
+        glUseProgram(0);
         
         // GPGPU CONCEPT 5: Copy To Texture (CTT) = Feedback.
         // We have just invoked our computation (edge detection) by applying 
@@ -184,7 +186,7 @@ public: // methods
         // more advanced samples.)
 
         // update the texture again, this time with the filtered scene
-        glBindTexture(GL_TEXTURE_2D, _iTexture);
+        glBindTexture(GL_TEXTURE_2D, _textureId);
         glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, _iWidth, _iHeight);
         
         // restore the stored viewport dimensions
@@ -194,7 +196,7 @@ public: // methods
     void display()
     {
         // Bind the filtered texture
-        glBindTexture(GL_TEXTURE_2D, _iTexture);
+        glBindTexture(GL_TEXTURE_2D, _textureId);
         glEnable(GL_TEXTURE_2D);
 
         // render a full-screen quad textured with the results of our 
@@ -213,16 +215,16 @@ public: // methods
     }
 
 protected: // data
-    int           _iWidth, _iHeight; // The dimensions of our array
-    float         _rAngle;           // used for animation
-	float         _hoge;
+    int _iWidth, _iHeight;	// The dimensions of our array
+    float _rAngle;			// used for animation
+	float _hoge;
     
-    unsigned int  _iTexture;         // The texture used as a data array
+    GLuint _textureId;		// The texture used as a data array
 
-    GLhandleARB   _programObject;    // the program used to update
-    GLhandleARB   _fragmentShader;
+    GLuint _programId;		// the program used to update
+    GLuint _fragmentShader;
 
-    GLint         _texUnit;          // a parameter to the fragment program
+    GLuint _texUnit;		// a parameter to the fragment program
 };
 
 // GLUT idle function
