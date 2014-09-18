@@ -1,27 +1,12 @@
-//      1.) Texture = Array
-//      2.) Fragment Program = Computational Kernel.
-//      3.) One-to-one Pixel to Texel Mapping: 
-//          a) Data-Dimensioned Viewport, and
-//          b) Orthographic Projection.
-//      4.) Viewport-Sized Quad = Data Stream Generator.
-//      5.) Copy To Texture = feedback.
-//
-
-
-#include <stdio.h>
-#include <stdlib.h>
 #define GLEW_STATIC 1
 #include <GL/glew.h>
 #include <GL/glut.h>
-#include <iostream>
-#include <fstream>
-#include <string>
 #include "GPGPU.h"
 
 void reshape(int w, int h);
 
 // globals
-GPGPU  *g_pHello;
+GPGPU  *gpgpu;
 
 // GLUT idle function
 void idle()
@@ -32,8 +17,8 @@ void idle()
 // GLUT display function
 void display()
 {
-    g_pHello->update();  // update the scene and run the edge detect filter
-    g_pHello->display(); // display the results
+    gpgpu->update();  // update the scene
+    gpgpu->display(); // display the results
     glutSwapBuffers();
 }
 
@@ -44,11 +29,7 @@ void reshape(int w, int h)
     
     glViewport(0, 0, w, h);
     
-    // GPGPU CONCEPT 3b: One-to-one Pixel to Texel Mapping: An Orthographic 
-    //                   Projection.
-    // This code sets the projection matrix to orthographic with a range of 
-    // [-1,1] in the X and Y dimensions. This allows a trivial mapping of 
-    // pixels to texels.
+	// We use orthographic projection for one-to-one pixel to texel mapping.
     glMatrixMode(GL_PROJECTION);    
     glLoadIdentity();               
     gluOrtho2D(-1, 1, -1, 1);       
@@ -59,14 +40,13 @@ void reshape(int w, int h)
 // Called at startup
 void initialize()
 {
-    // Initialize the "OpenGL Extension Wrangler" library
+    // Initialize glew library
     glewInit();
 
-    // Create the example object
-    g_pHello = new GPGPU(512, 512);
+    // Create the gpgpu object
+    gpgpu = new GPGPU(512, 512);
 }
 
-// The main function
 int main()
 {
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
