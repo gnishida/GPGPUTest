@@ -16,11 +16,13 @@ void idle()
 // GLUT display function
 void display()
 {
-	// Update the scene
-    gpgpu->update();  
+	for (int i = 0; i < 10; ++i) {
+		// Update the scene
+		gpgpu->update();  
 
-	// Display the results
-    gpgpu->display();
+		// Display the results
+		gpgpu->display();
+	}
     glutSwapBuffers();
 }
 

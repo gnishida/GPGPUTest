@@ -27,10 +27,10 @@ void update()
 {
 	const float offset = 1.0 / 512.0;
 	
-	const float F = 0.035;
+	const float F = 0.037;
 	const float K = 0.06;
-	const float Du = 0.082;
-	const float Dv = 0.041;
+	const float Du = 0.209;
+	const float Dv = 0.1;
 
 	vec2 texCoord = gl_TexCoord[0].xy;
 
