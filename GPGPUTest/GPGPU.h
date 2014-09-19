@@ -12,19 +12,16 @@ public:
 
 	void update();
 	void display();
-	int loadshader(char* filename, std::string& text);
+	int loadShader(char* filename, std::string& text);
 
 private:
     int _iWidth, _iHeight;	// The dimensions of the data array
-    float _rAngle;			// used for animation
-	float _hoge;
 	int _initialized;
 	GLuint _initializedLoc;
+    GLuint _texLoc;		// a parameter to the fragment program
     
     GLuint _textureId;		// The texture ID used to store data array
     GLuint _programId;		// the program ID
     GLuint _fragmentShader;
-
-    GLuint _texUnit;		// a parameter to the fragment program
 };
 

@@ -5,7 +5,6 @@
 
 void reshape(int w, int h);
 
-// globals
 GPGPU  *gpgpu;
 
 // GLUT idle function
@@ -17,8 +16,11 @@ void idle()
 // GLUT display function
 void display()
 {
-    gpgpu->update();  // update the scene
-    gpgpu->display(); // display the results
+	// Update the scene
+    gpgpu->update();  
+
+	// Display the results
+    gpgpu->display();
     glutSwapBuffers();
 }
 
@@ -29,7 +31,7 @@ void reshape(int w, int h)
     
     glViewport(0, 0, w, h);
     
-	// We use orthographic projection for one-to-one pixel to texel mapping.
+	// Use orthographic projection
     glMatrixMode(GL_PROJECTION);    
     glLoadIdentity();               
     gluOrtho2D(-1, 1, -1, 1);       
