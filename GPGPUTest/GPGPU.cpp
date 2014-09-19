@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 
-GPGPU::GPGPU(int w, int h) : _initialized(0), _iWidth(w), _iHeight(h)
+GPGPU::GPGPU(int w, int h) : _initialized(0), _width(w), _height(h)
 {
     // Create a texture to store the framebuffer
     glGenTextures(1, &_textureId);
@@ -11,7 +11,7 @@ GPGPU::GPGPU(int w, int h) : _initialized(0), _iWidth(w), _iHeight(h)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _iWidth, _iHeight, 0, GL_RGB, GL_FLOAT, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, _width, _height, 0, GL_RGB, GL_FLOAT, 0);
 
     _programId = glCreateProgram();
 
@@ -19,7 +19,7 @@ GPGPU::GPGPU(int w, int h) : _initialized(0), _iWidth(w), _iHeight(h)
 	std::string edgeFragSource2;
 	loadShader("fragment.glsl", edgeFragSource2);
 
-    // Create the edge detection fragment program
+    // Create the fragment program
     _fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	const char* source = edgeFragSource2.c_str();
     glShaderSource(_fragmentShader, 1, &source, NULL);
@@ -52,14 +52,14 @@ void GPGPU::update()
     int vp[4];
     glGetIntegerv(GL_VIEWPORT, vp);
 
-    glViewport(0, 0, _iWidth, _iHeight);
+    glViewport(0, 0, _width, _height);
         
     // Copy the results to the texture
 	glBindTexture(GL_TEXTURE_2D, _textureId);
 
 	glUseProgram(_programId);
             
-    // set the uniform variables
+    // Set the uniform variables
     glUniform1i(_texUnitLoc, 0);
 	glUniform1i(_initializedLoc, _initialized);
 	_initialized = 1;
@@ -76,9 +76,9 @@ void GPGPU::update()
 
     glUseProgram(0);
         
-    // Copy the rendered image to the texture so that we can start from here in the next iteration
+    // Copy the rendered image to the texture so that we can start from the current state in the next iteration
     glBindTexture(GL_TEXTURE_2D, _textureId);
-    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, _iWidth, _iHeight);
+    glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, _width, _height);
         
     // Restore the stored viewport dimensions
 	glViewport(vp[0], vp[1], vp[2], vp[3]);
@@ -86,7 +86,7 @@ void GPGPU::update()
 
 void GPGPU::display()
 {
-    // Bind the filtered texture
+    // Bind the texture
     glBindTexture(GL_TEXTURE_2D, _textureId);
     glEnable(GL_TEXTURE_2D);
 

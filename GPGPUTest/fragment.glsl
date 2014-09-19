@@ -27,19 +27,20 @@ void update()
 {
 	const float offset = 1.0 / 512.0;
 	
-	const float F = 0.037;
-	const float K = 0.06;
-	const float Du = 0.209;
-	const float Dv = 0.1;
-
 	vec2 texCoord = gl_TexCoord[0].xy;
 
+	// parameters for Gray-Scott model
+	float F = 0.037;
+	float K = 0.06;
+	float Du = 0.209;
+	float Dv = 0.102;
+
 	// get the colors of the pixels
-	vec2 c  = texture2D(texUnit, texCoord).rb;
-	vec2 l  = texture2D(texUnit, texCoord + vec2(-offset,     0.0)).rb;
-	vec2 t  = texture2D(texUnit, texCoord + vec2(    0.0,  offset)).rb;
-	vec2 r  = texture2D(texUnit, texCoord + vec2( offset,     0.0)).rb;
-	vec2 b  = texture2D(texUnit, texCoord + vec2(    0.0, -offset)).rb;
+	vec2 c = texture2D(texUnit, texCoord).rb;
+	vec2 l = texture2D(texUnit, texCoord + vec2(-offset, 0.0)).rb;
+	vec2 t = texture2D(texUnit, texCoord + vec2(0.0, offset)).rb;
+	vec2 r = texture2D(texUnit, texCoord + vec2(offset, 0.0)).rb;
+	vec2 b = texture2D(texUnit, texCoord + vec2(0.0, -offset)).rb;
 
 	float U = c.x;
 	float V = c.y;

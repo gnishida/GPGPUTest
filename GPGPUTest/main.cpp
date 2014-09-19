@@ -17,12 +17,13 @@ void idle()
 void display()
 {
 	for (int i = 0; i < 10; ++i) {
-		// Update the scene
+		// Update the cells' states
 		gpgpu->update();  
 
 		// Display the results
 		gpgpu->display();
 	}
+
     glutSwapBuffers();
 }
 

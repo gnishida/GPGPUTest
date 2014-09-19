@@ -15,13 +15,16 @@ public:
 	int loadShader(char* filename, std::string& text);
 
 private:
-    int _iWidth, _iHeight;	// The dimensions of the data array
-	int _initialized;
+    int _width;				// width of the screen
+	int _height;			// height of the screen
+	int _initialized;		// if the cells are initialized (=1) or not (=0)
+
 	GLuint _initializedLoc;
-    GLuint _texUnitLoc;		// a parameter to the fragment program
+    GLuint _texUnitLoc;
     
     GLuint _textureId;		// The texture ID used to store data array
     GLuint _programId;		// the program ID
+
     GLuint _fragmentShader;
 };
 
