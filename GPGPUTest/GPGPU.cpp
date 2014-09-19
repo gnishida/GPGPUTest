@@ -42,7 +42,7 @@ GPGPU::GPGPU(int w, int h) : _initialized(0), _iWidth(w), _iHeight(h)
 	}
 
     // Get location of the uniform variables
-    _texLoc = glGetUniformLocation(_programId, "tex");
+    _texUnitLoc = glGetUniformLocation(_programId, "texUnit");
 	_initializedLoc = glGetUniformLocation(_programId, "initialized");
 }
 
@@ -60,7 +60,7 @@ void GPGPU::update()
 	glUseProgram(_programId);
             
     // set the uniform variables
-    glUniform1i(_texLoc, 0);
+    glUniform1i(_texUnitLoc, 0);
 	glUniform1i(_initializedLoc, _initialized);
 	_initialized = 1;
             

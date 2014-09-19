@@ -18,7 +18,7 @@ private:
     int _iWidth, _iHeight;	// The dimensions of the data array
 	int _initialized;
 	GLuint _initializedLoc;
-    GLuint _texLoc;		// a parameter to the fragment program
+    GLuint _texUnitLoc;		// a parameter to the fragment program
     
     GLuint _textureId;		// The texture ID used to store data array
     GLuint _programId;		// the program ID
